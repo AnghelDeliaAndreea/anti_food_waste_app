@@ -252,62 +252,27 @@ app.get('/products/expiring', authenticateToken, (req, res) => {
 //endpoint pentru marcare disponibilitate
 app.post('/products/:id/share', authenticateToken, (req, res) => {
   const { id } = req.params;
-  const { isShared } = req.body;
-  
-  console.log('Request primit pentru share:', {
-    id: id,
-    isShared: isShared,
-    userId: req.user.id
-  });
 
-  // Verificăm mai întâi dacă produsul există
   db.query(
-    'SELECT * FROM Produse WHERE id = ? AND id_client = ?',
+    'UPDATE Produse SET is_shared = 1 WHERE id = ? AND id_client = ?',
     [id, req.user.id],
     (err, results) => {
       if (err) {
-        console.error('Eroare la verificarea produsului:', err);
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Eroare la verificarea produsului' 
+        return res.status(500).json({
+          success: false,
+          message: 'Eroare la partajarea produsului'
         });
       }
 
-      if (results.length === 0) {
-        console.log('Produsul nu a fost găsit sau nu aparține utilizatorului');
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Produsul nu a fost găsit sau nu aparține utilizatorului' 
-        });
-      }
-
-      // Dacă produsul există, îl actualizăm
-      db.query(
-        'UPDATE Produse SET disponibil = 1 WHERE id = ? AND id_client = ?',
-        [id, req.user.id],  // Convertim boolean la 0/1 pentru MySQL
-        (updateErr, updateResult) => {
-          if (updateErr) {
-            console.error('Eroare la actualizarea produsului:', updateErr);
-            return res.status(500).json({ 
-              success: false, 
-              message: 'Eroare la actualizarea produsului' 
-            });
-          }
-          
-          console.log('Produs actualizat cu succes:', {
-            id: id,
-            affected_rows: updateResult.affectedRows
-          });
-
-          res.json({ 
-            success: true, 
-            message: 'Produsul a fost marcat ca disponibil' 
-          });
-        }
-      );
+      res.json({
+        success: true,
+        message: 'Produsul a fost marcat ca partajat'
+      });
     }
   );
 });
+
+
 
 // Endpoint pentru crearea unui grup nou
 app.post('/groups', authenticateToken, (req, res) => {
@@ -462,7 +427,7 @@ app.get('/groups/:groupId/available-products', authenticateToken, (req, res) => 
      FROM Produse p
      JOIN Membri_Grup mg ON p.id_client = mg.id_membru
      JOIN Conturi_Utilizatori cu ON p.id_client = cu.id
-     WHERE mg.id_grup = ? AND p.is_shared = true`,
+     WHERE mg.id_grup = ? AND p.is_shared = 1`, // Asigură-te că verificarea is_shared este corectă
     [groupId],
     (err, results) => {
       if (err) {
@@ -476,6 +441,7 @@ app.get('/groups/:groupId/available-products', authenticateToken, (req, res) => 
     }
   );
 });
+
 
 app.delete('/groups/:groupId', authenticateToken, (req, res) => {
   const { groupId } = req.params;

@@ -194,6 +194,37 @@ function App() {
     }
   };
 
+  const handleShare = async (productID) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+  
+    try {
+      const response = await fetch(`http://localhost:5000/products/${productID}/share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ is_shared: 1 })
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert('Produsul a fost marcat ca partajat!');
+        fetchProducts(); // Actualizează lista de produse
+        fetchGroupAvailableProducts(selectedGroupForProducts); // Reîncarcă produsele disponibile în grup
+      } else {
+        alert(`Eroare la partajarea produsului: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Eroare completă:', error);
+      alert('A apărut o problemă. Te rugăm să încerci din nou.');
+    }
+  };
+  
+  
+
   const handleDelete = async (productId) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -883,7 +914,7 @@ const sendInvitations = async (groupId, emailsString) => {
                       <div className="product-actions">
                         <button onClick={() => handleEdit(produs)}>Modifică</button>
                         <button onClick={() => handleDelete(produs.id)}>Șterge</button>
-                        
+                        <button onClick={()=> handleShare(produs.id)}>Imparte pentru grup</button>
                         {produs.isShared && (
                           <span className="shared-badge">
                             Marcat ca disponibil
@@ -1132,5 +1163,6 @@ const sendInvitations = async (groupId, emailsString) => {
 
     </div>
   );
+
 }
 export default App;
