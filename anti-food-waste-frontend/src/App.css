@@ -1,0 +1,587 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.logout-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff4d4d;
+  color: white;
+  font-size: 14px;
+}
+
+.logout-button:hover {
+  background-color: #ff6666;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.product-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+.product-item-expired {
+  border: 1px solid #ffebee;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.available {
+  background-color: #e3f2fd;
+  border-left: 5px solid #2196f3;
+}
+
+.normal {
+  background-color: #f5f5f5;
+  border-left: 5px solid #4caf50;
+}
+
+.expired {
+  background-color: #ffebee;
+  border-left: 5px solid #f44336;
+}
+.products-expired-list {
+  list-style: none;
+  background-color: #ffebee;
+  padding: 0;
+}
+
+.products-list {
+  list-style: none;
+  padding: 0;
+}
+
+.product-actions {
+  margin-top: 10px;
+}
+
+.product-actions button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.product-info {
+  margin-bottom: 10px;
+}
+
+.groups-section {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.add-group-form,
+.add-member-form {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.groups-list {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.group-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.group-item button {
+  margin-top: 10px;
+}
+
+.members-list {
+  margin: 20px 0;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.member-email {
+  margin-right: 10px;
+}
+
+.delete-member-button {
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-member-button:hover {
+  background-color: #cc0000;
+}
+
+.close-modal-button {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.close-modal-button:hover {
+  background-color: #444;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+}
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.available-products-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 1rem 0;
+}
+
+.product-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f9fafb;
+}
+
+.product-item h4 {
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+}
+
+.product-item p {
+  margin: 0.25rem 0;
+  color: #4b5563;
+}
+
+.group-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.group-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  background-color: #3b82f6;
+  color: white;
+}
+
+.group-actions button:hover {
+  background-color: #2563eb;
+}
+
+.group-actions .delete-button {
+  background-color: #ef4444;
+}
+
+.group-actions .delete-button:hover {
+  background-color: #dc2626;
+}
+
+.message {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.invite-form textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.members-list {
+  margin-top: 20px;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.member-item:hover {
+  background-color: #e0e0e0;
+}
+
+.close-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.close-button:hover {
+  background-color: #d32f2f;
+}
+
+.product-item.normal {
+  background-color: #ffffcc; /* Galben pal pentru produse normale */
+}
+
+.product-item.available {
+  background-color: #ccffcc; /* Verde pal pentru produse disponibile */
+}
+
+.product-item.expired {
+  background-color: #ffcccc; /* Roșu pal pentru produse expirate */
+}
+
+.product-actions button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+
+.product-actions button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #ff4444;
+}
+
+.delete-button:hover {
+  background-color: #cc0000;
+}
+/* Stilizare pentru grupuri */
+.groups-section {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.groups-section h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.group-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: box-shadow 0.2s;
+}
+
+.group-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.group-item h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.group-item p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.group-actions {
+  margin-top: 10px;
+}
+
+.group-actions button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.group-actions button:hover {
+  background-color: #0056b3;
+}
+
+.group-actions .delete-member-button {
+  background-color: #ff4444;
+}
+
+.group-actions .delete-member-button:hover {
+  background-color: #cc0000;
+}
+
+/* Stilizare pentru modale */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #333;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.modal-content button {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  margin-right: 10px;
+  transition: background-color 0.2s;
+}
+
+.modal-content button:hover {
+  background-color: #0056b3;
+}
+
+.modal-content .delete-member-button {
+  background-color: #ff4444;
+}
+
+.modal-content .delete-member-button:hover {
+  background-color: #cc0000;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Trei coloane */
+  gap: 20px; /* Spațiu între coloane */
+  margin: 20px 0;
+}
+
+.products-section {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.products-section h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.products-list {
+  list-style: none;
+  padding: 0;
+}
+
+.product-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  transition: box-shadow 0.2s;
+}
+
+.product-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-actions button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+
+.product-actions button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #ff4444;
+}
+
+.delete-button:hover {
+  background-color: #cc0000;
+}
+
+.normal {
+  background-color: #ffffcc; /* Galben pal pentru produse normale */
+}
+
+.available {
+  background-color: #ccffcc; /* Verde pal pentru produse disponibile */
+}
+
+.expired {
+  background-color: #ffcccc; /* Roșu pal pentru produse expirate */
+}
+

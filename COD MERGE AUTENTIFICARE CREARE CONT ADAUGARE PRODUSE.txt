@@ -1,0 +1,550 @@
+FRONT
+import './App.css';
+import { useEffect, useState } from 'react';
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [nume, setNume] = useState('');
+  const [email, setEmail] = useState('');
+  const [parola, setParola] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [newProduct, setNewProduct] = useState({ name: '', category: '', expirationDate: '' });
+  const [editProduct,  setEditProduct]= useState(null);
+
+  const registerUser = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nume, email, parola }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert('Înregistrare reușită! Acum te poți loga.');
+        setIsLogin(true);
+      } else {
+        alert('Eroare la înregistrare: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Eroare la înregistrare:', error);
+      alert('A apărut o problemă. Te rugăm să încerci din nou.');
+    }
+  };
+
+  const loginUser = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, parola }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        setIsAuthenticated(true);
+        fetchProducts();
+      } else {
+        alert('Autentificare eșuată: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Eroare la autentificare:', error);
+      alert('A apărut o problemă. Te rugăm să încerci din nou.');
+    }
+  };
+
+  const logoutUser = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setProducts([]);
+    setNume('');
+    setEmail('');
+    setParola('');
+  };
+
+  const fetchProducts = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('http://localhost:5000/products', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 401) {
+        alert('Acces neautorizat! Te rugăm să te autentifici din nou.');
+        setIsAuthenticated(false);
+        localStorage.removeItem('token');
+        return;
+      }
+
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error('Eroare la obținerea produselor:', error);
+      alert('A apărut o problemă la obținerea produselor.');
+    }
+  };
+
+  const addProduct = async () => {
+    const token = localStorage.getItem('token');
+    const userID=JSON.parse(atob(token.split('.')[1])).id; //am luat id-ul de la utilizator
+    
+    const productData={
+      denumire: newProduct.name,
+      categorie:newProduct.category,
+      data_expirare:newProduct.expirationDate,
+      id_client: userID
+    }
+
+  try{
+    const response= await fetch('http://localhost:5000/products',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if(response.ok){
+      alert('Produs adaugat cu succes!');
+      fetchProducts();
+      setShowAddProduct(false);
+    }
+    else{
+      alert('Eroare la adaugarea produsului');
+    }
+  }catch(error){
+    console.error('Eroare la adaugarea produsului:',error);
+    alert('A aparut o eroare. Incearca din nou!');
+  }
+};
+
+const handleDelete = async (productId) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Te rugăm să te autentifici pentru a șterge un produs.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:5000/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(data.message);
+      fetchProducts(); // Reîmprospătăm lista de produse
+    } else {
+      alert(data.message || 'Eroare la ștergerea produsului');
+    }
+  } catch (error) {
+    console.error('Eroare la ștergerea produsului:', error);
+    alert('A apărut o problemă la ștergerea produsului. Te rugăm să încerci din nou.');
+  }
+};
+
+  const handleEdit = (product) => {
+    setEditProduct(product);
+    setNewProduct({
+      denumire: product.denumire,
+      categorie: product.categorie,
+      data_expirare: product.data_expirare,
+    });
+    setShowAddProduct(true);
+  };
+
+  //functie edit produs trimite backend
+  const editProductData = async () => {
+    const token = localStorage.getItem('token');
+    const userID = JSON.parse(atob(token.split('.')[1])).id;  // Am luat ID-ul de la utilizator
+  
+    const productData = {
+      denumire: newProduct.denumire,
+      categorie: newProduct.categorie,
+      data_expirare: newProduct.data_expirare,
+      id_client: userID,
+    };
+  
+    try {
+      const response = await fetch(`http://localhost:5000/products/${editProduct.id}`, {
+        method: 'PUT',  // Sau 'PATCH', în funcție de backend
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+  
+      if (response.ok) {
+        alert('Produs modificat cu succes!');
+        fetchProducts();  // Actualizăm lista de produse
+        setShowAddProduct(false);  // Ascundem formularul
+        setEditProduct(null);  // Resetăm produsul editat
+      } else {
+        alert('Eroare la modificarea produsului.');
+      }
+    } catch (error) {
+      console.error('Eroare la modificarea produsului:', error);
+      alert('A apărut o eroare. Încercați din nou!');
+    }
+  };
+  
+
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      fetchProducts();
+    }
+  }, []);
+
+  return (
+    <div className="App">
+      {!isAuthenticated ? (
+        <div>
+          <h1>{isLogin ? 'Login' : 'Register'}</h1>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              isLogin ? loginUser() : registerUser();
+            }}
+          >
+            {!isLogin && (
+              <div>
+                <label>
+                  Nume:
+                  <input
+                    type="text"
+                    value={nume}
+                    onChange={(e) => setNume(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
+            )}
+            <div>
+              <label>
+                Email:
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Parola:
+                <input
+                  type="password"
+                  value={parola}
+                  onChange={(e) => setParola(e.target.value)}
+                  required
+                />
+              </label>
+            </div>
+            <button type="submit">{isLogin ? 'Login' : 'Register'}</button>
+          </form>
+          <button onClick={toggleForm}>
+            {isLogin ? 'Nu ai cont? Creează unul!' : 'Ai deja cont? Intră pe contul tău!'}
+          </button>
+        </div>
+      ) : (
+        <div>
+          {isAuthenticated && (
+            <button className="logout-button" onClick={logoutUser}>
+              Ieși din cont
+            </button>
+          )}
+          <h1>Frigiderul Meu</h1>
+          <button onClick={() => setShowAddProduct(true)}>Adaugă produs</button>
+          {products.length === 0 ? (
+            <div>
+              <p>Frigiderul este gol.</p>
+              <button onClick={() => setShowAddProduct(true)}>Adaugă produs</button>
+            </div>
+          ) : (
+            <ul>
+              {products.map((product) => (
+                <li key={product.id}>
+                  <h3>{product.denumire}</h3>
+                  <p>Categorie: {product.categorie}</p>
+                  <p>Expiră la: {product.data_expirare}</p>
+                  <button onClick={() => handleEdit(product)}>Modifică</button>
+                  <button onClick={() => handleDelete(product.id)}>Șterge</button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {showAddProduct && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if(editProduct){
+                  editProductData();
+                }
+                else
+                addProduct();
+              }}
+            >
+              <div>
+                <label>
+                  Nume produs:
+                  <input
+                    type="text"
+                    value={newProduct.denumire}
+                    onChange={(e) => setNewProduct({ ...newProduct, denumire: e.target.value })}
+                    required
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Categorie:
+                  <input
+                    type="text"
+                    value={newProduct.categorie}
+                    onChange={(e) => setNewProduct({ ...newProduct, categorie: e.target.value })}
+                    required
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  Data expirării:
+                  <input
+                    type="date"
+                    value={newProduct.data_expirare}
+                    onChange={(e) => setNewProduct({ ...newProduct, data_expirare: e.target.value })}
+                    required
+                  />
+                </label>
+              </div>
+              <button type="submit">Salveaza modificari</button>
+              <button type="button" onClick={() => setShowAddProduct(false)}>Anulează</button>
+            </form>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
+BACK
+const express = require('express');
+// pentru middleware
+const bodyparser = require('body-parser');
+const db = require('./db');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
+const app = express();
+const port = 5000; // Schimbă portul aici
+
+const JWT_SECRET = 'cheia_secreta';
+
+const cors = require('cors');
+app.use(cors());
+app.use(bodyparser.json());
+
+// Middleware pentru validarea token-ului JWT
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
+  if (!token) return res.status(403).send('Acces interzis!'); // Dacă nu există token
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).send('Token invalid!');
+    req.user = user;
+    next();
+  });
+}
+
+// Obține toate produsele (pentru utilizatori autentificați)
+app.get('/products', authenticateToken, (req, res) => {
+  db.query('SELECT * FROM Produse WHERE id_client = ?', [req.user.id], (err, results) => {
+    if (err) {
+      res.status(500).send('Eroare la interogarea bazei de date');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// Endpoint pentru adăugarea unui produs
+app.post('/products', authenticateToken, (req, res) => {
+  const { denumire, categorie, data_expirare} = req.body;
+  const id_client= req.user.id;
+
+  // Validarea datelor
+  if (!denumire || !categorie || !data_expirare) {
+    return res.status(400).send('Toate câmpurile sunt obligatorii!');
+  }
+
+  // Adăugăm produsul în baza de date
+  db.query(
+    'INSERT INTO Produse (denumire, categorie, data_expirare, id_client) VALUES (?, ?, ?, ?)',
+    [denumire, categorie, data_expirare, id_client],
+    (err, results) => {
+      if (err) {
+        return res.status(500).send('Eroare la adăugarea produsului');
+      }
+      res.status(201).json({ success: true, message: 'Produsul a fost adăugat cu succes!' });
+    }
+  );
+});
+
+// Endpoint pentru crearea unui nou utilizator
+app.post('/register', (req, res) => {
+  const { nume, email, parola } = req.body;
+
+  // Verificăm dacă deja există utilizatorul
+  db.query('SELECT * FROM Conturi_Utilizatori WHERE email=?', [email], (err, results) => {
+    if (err) {
+      return res.status(500).send('Eroare la verificarea utilizatorului');
+    }
+
+    if (results.length > 0) {
+      return res.status(400).send('Utilizatorul cu acest email există deja');
+    }
+
+    // Criptarea parolei
+    bcrypt.hash(parola, 10, (err, hashedPassword) => {
+      if (err) {
+        return res.status(500).send('Eroare la criptarea parolei');
+      }
+
+      // Adăugăm utilizatorul în baza de date
+      db.query(
+        'INSERT INTO Conturi_Utilizatori (nume, email, parola) VALUES (?, ?, ?)',
+        [nume, email, hashedPassword],
+        (err, results) => {
+          if (err) {
+            return res.status(500).send('Eroare la crearea contului');
+          }
+          res.status(201).json({ success: true, message: 'Contul a fost creat cu succes!' });
+        }
+      );
+    });
+  });
+});
+
+// Endpoint pentru autentificare
+app.post('/login', (req, res) => {
+  const { email, parola } = req.body;
+  // Verificăm dacă utilizatorul există
+  db.query('SELECT * FROM Conturi_Utilizatori WHERE email=?', [email], (err, results) => {
+    if (err) {
+      return res.status(500).send('Eroare la verificarea utilizatorului');
+    }
+    if (results.length === 0) {
+      return res.status(400).send('Email sau parola incorectă');
+    }
+    // Comparăm parola criptată cu cea trimisă de utilizator
+    bcrypt.compare(parola, results[0].parola, (err, isMatch) => {
+      if (err) {
+        return res.status(500).send('Eroare la compararea parolei');
+      }
+      if (!isMatch) {
+        return res.status(400).send('Email sau parola incorectă');
+      }
+      const token = jwt.sign({ id: results[0].id, email: results[0].email }, JWT_SECRET, {
+        expiresIn: '1h',
+      });
+      res.status(200).json({ success: true, token });
+    });
+  });
+});
+
+// Endpoint pentru actualizarea unui produs
+app.put('/products/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;  // ID-ul produsului care trebuie editat
+  const { denumire, categorie, data_expirare } = req.body;  // Datele actualizate pentru produs
+
+  // Validăm că toate câmpurile necesare sunt prezente
+  if (!denumire || !categorie || !data_expirare) {
+    return res.status(400).send('Toate câmpurile sunt obligatorii!');
+  }
+
+  // Verificăm dacă produsul există în baza de date
+  db.query('SELECT * FROM Produse WHERE id = ? AND id_client = ?', [id, req.user.id], (err, results) => {
+    if (err) {
+      return res.status(500).send('Eroare la verificarea produsului');
+    }
+    if (results.length === 0) {
+      return res.status(404).send('Produsul nu a fost găsit!');
+    }
+
+    // Actualizăm produsul în baza de date
+    db.query(
+      'UPDATE Produse SET denumire = ?, categorie = ?, data_expirare = ? WHERE id = ?',
+      [denumire, categorie, data_expirare, id],
+      (err, results) => {
+        if (err) {
+          return res.status(500).send('Eroare la actualizarea produsului');
+        }
+        res.status(200).json({ success: true, message: 'Produsul a fost actualizat cu succes!' });
+      }
+    );
+  });
+});
+
+// Endpoint pentru ștergerea unui produs
+app.delete('/products/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+  const id_client = req.user.id; // Obținem id-ul clientului din token
+
+  // Verificăm mai întâi dacă produsul există și aparține utilizatorului
+  db.query(
+    'SELECT * FROM Produse WHERE id = ? AND id_client = ?',
+    [id, id_client],
+    (err, results) => {
+      if (err) {
+        console.error('Eroare la verificarea produsului:', err);
+        return res.status(500).send('Eroare la verificarea produsului');
+      }
+
+      if (results.length === 0) {
+        return res.status(404).send('Produsul nu a fost găsit sau nu aparține acestui utilizator');
+      }
+
+      // Dacă produsul există și aparține utilizatorului, îl ștergem
+      db.query(
+        'DELETE FROM Produse WHERE id = ? AND id_client = ?',
+        [id, id_client],
+        (err, deleteResults) => {
+          if (err) {
+            console.error('Eroare la ștergerea produsului:', err);
+            return res.status(500).send('Eroare la ștergerea produsului');
+          }
+
+          res.status(200).json({
+            success: true,
+            message: 'Produsul a fost șters cu succes'
+          });
+        }
+      );
+    }
+  );
+});
+
+console.log('Începe serverul...');
+app.listen(port, () => {
+  console.log(`Serverul rulează la http://localhost:${port}`);
+});
